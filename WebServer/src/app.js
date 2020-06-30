@@ -1,6 +1,8 @@
 const express = require("express");
 const hbs = require("hbs");
 const path = require("path");
+const geocode = require("./utils/geocode");
+const weatherForecast = require("./utils/weatherForecast");
 
 const app = express();
 app.set("view engine", "hbs")
@@ -19,8 +21,22 @@ app.get("/weather", (req, res) => {
     if(!req.query.address){
         return res.send("The address was not provided");
     }
-    res.send({
-        address: req.query.address
+
+    geocode(req.query.address, (error, {placeName, latitude, longitude}) => {
+       if(error){
+           return res.send(error);
+       } 
+
+       weatherForecast({latitude: latitude, longitude: longitude}, (err, weatherMessage) => {
+           if(err){
+               return res.send(err);
+           }
+
+           return (res.send({
+               placeName: placeName,
+               forecast: weatherMessage
+           }))
+       });
     });
 });
 
