@@ -13,6 +13,11 @@ const geocode = (address, callback) => {
             return;
         }
 
+        if(response.body.features.length === 0) {
+            callback("Address not found");
+            return;
+        }
+
         const center = response.body.features[0].center;
         callback(undefined, {
             placeName: response.body.features[0].place_name,

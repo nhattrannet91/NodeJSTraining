@@ -19,17 +19,18 @@ app.get("", (req, res) => {
 
 app.get("/weather", (req, res) => {
     if(!req.query.address){
-        return res.send("The address was not provided");
+        return res.send({
+            error: "The address was not provided" });
     }
 
-    geocode(req.query.address, (error, {placeName, latitude, longitude}) => {
+    geocode(req.query.address, (error, {placeName, latitude, longitude} = {}) => {
        if(error){
-           return res.send(error);
+           return res.send({ error: error });
        } 
 
        weatherForecast({latitude: latitude, longitude: longitude}, (err, weatherMessage) => {
            if(err){
-               return res.send(err);
+               return res.send({ error: err });
            }
 
            return (res.send({
@@ -50,6 +51,13 @@ app.get("/about", (req, res) => {
 app.get("/help", (req, res) => {
     res.render("help", {
         title: "Help Page",
+        createdBy: "Nhat Tran"
+    });
+});
+
+app.get("*", (req, res) => {
+    res.render("404", {
+        title: "404 - Page not found",
         createdBy: "Nhat Tran"
     });
 });
